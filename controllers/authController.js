@@ -5,9 +5,9 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password, role, skills, bio } = req.body;
 
-    // Block admin registration from the public form
-    if (role === 'admin') {
-      return res.status(403).json({ message: 'You cannot register as admin. Contact the super admin.' });
+    // Block anyone trying to register as admin or superadmin
+    if (role === 'admin' || role === 'superadmin') {
+      return res.status(403).json({ message: 'You cannot register as admin or superadmin.' });
     }
 
     const userExists = await User.findOne({ email });
@@ -16,7 +16,6 @@ const registerUser = async (req, res) => {
     const user = await User.create({ name, email, password, role, skills, bio });
     res.status(201).json({
       _id: user._id, name: user.name, email: user.email, role: user.role,
-      isSuperAdmin: user.isSuperAdmin,
       skills: user.skills, bio: user.bio, profileImage: user.profileImage,
       rating: user.rating, token: generateToken(user._id),
     });
@@ -32,7 +31,6 @@ const loginUser = async (req, res) => {
     if (user && (await user.matchPassword(password))) {
       res.json({
         _id: user._id, name: user.name, email: user.email, role: user.role,
-        isSuperAdmin: user.isSuperAdmin,
         skills: user.skills, bio: user.bio, profileImage: user.profileImage,
         rating: user.rating, token: generateToken(user._id),
       });

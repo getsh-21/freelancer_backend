@@ -1,17 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const { getAnalytics, deleteUser, adminDeleteJob, promoteToAdmin, demoteFromAdmin } = require('../controllers/adminController');
+const {
+  getAnalytics, deleteUser, adminDeleteJob,
+  promoteToAdmin, revokeAdmin,
+} = require('../controllers/adminController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
 
-router.use(protect, authorizeRoles('admin'));
+// All admin routes require login + admin or superadmin role
+router.use(protect, authorizeRoles('admin', 'superadmin'));
 
 router.get('/analytics', getAnalytics);
 router.delete('/users/:id', deleteUser);
 router.delete('/jobs/:id', adminDeleteJob);
 
-// Super admin only
-router.put('/users/:id/promote', promoteToAdmin);
-router.put('/users/:id/demote', demoteFromAdmin);
+// Superadmin-only routes
+router.put('/users/:id/promote', authorizeRoles('superadmin'), promoteToAdmin);
+router.put('/users/:id/revoke', authorizeRoles('superadmin'), revokeAdmin);
 
 module.exports = router;

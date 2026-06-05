@@ -5,8 +5,11 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['client', 'freelancer', 'admin'], default: 'freelancer' },
-  isSuperAdmin: { type: Boolean, default: false },
+  role: {
+    type: String,
+    enum: ['client', 'freelancer', 'admin', 'superadmin'],
+    default: 'freelancer',
+  },
   skills: [{ type: String }],
   bio: { type: String, default: '' },
   profileImage: { type: String, default: '' },
@@ -22,8 +25,8 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+userSchema.methods.matchPassword = async function (entered) {
+  return await bcrypt.compare(entered, this.password);
 };
 
 module.exports = mongoose.model('User', userSchema);
