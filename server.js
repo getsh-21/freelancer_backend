@@ -38,7 +38,8 @@ app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Health check endpoint for Render
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/', (req, res) => res.json({ message: 'FreelanceHub API is running ✓' }));
+app.get('/health', (req, res) => res.json({ status: 'ok' }));;
 
 chatSocket(io);
 
